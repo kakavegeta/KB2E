@@ -16,7 +16,7 @@ using namespace std;
 bool L1_flag=1;
 
 //normal distribution
-double rand(double min, double max)
+double rand(double min, double max)  //
 {
     return min+(max-min)*rand()/(RAND_MAX+1.0);
 }
@@ -82,7 +82,7 @@ public:
         fb_l.push_back(y);
         ok[make_pair(x,z)][y]=1;
     }
-    void run(int n_in,double rate_in,double margin_in,int method_in)
+    void run(int n_in,double rate_in,double margin_in,int method_in)  //初始化和训练
     {
         n = n_in;
         m = n_in;
@@ -105,13 +105,13 @@ public:
 		        }
 		    }
 		}
-        relation_vec.resize(relation_num);
+        relation_vec.resize(relation_num); //设置关系向量数目和维数m
 		for (int i=0; i<relation_vec.size(); i++)
 			relation_vec[i].resize(m);
-        entity_vec.resize(entity_num);
+        entity_vec.resize(entity_num); //设置实体向量数目和维数n
 		for (int i=0; i<entity_vec.size(); i++)
 			entity_vec[i].resize(n);
-        for (int i=0; i<relation_num; i++)
+        for (int i=0; i<relation_num; i++) //初始化关系向量和实体向量
         {
             for (int ii=0; ii<m; ii++)
                 relation_vec[i][ii] = randn(0,1.0/m,-1,1);
@@ -130,7 +130,7 @@ public:
         {
             for (int ii=0; ii<n; ii++)
             	fscanf(f2,"%lf",&relation_vec[i][ii]);
-        }
+        } //初始化关系向量和实体向量
         fclose(f2);
         bfgs();
     }
@@ -143,14 +143,14 @@ private:
     vector<vector<double> > relation_vec,entity_vec;
     vector<vector<double> > relation_tmp,entity_tmp;
     vector<vector<vector<double> > > A,A_tmp;
-    void norm(vector<double> &a)
+    void norm(vector<double> &a) //限制模长
     {
         double x = vec_len(a);
         if (x>1)
         for (int ii=0; ii<a.size(); ii++)
                 a[ii]/=x;
     }
-    void norm(vector<double> &a, vector<vector<double> > &A)
+    void norm(vector<double> &a, vector<vector<double> > &A) //限制一维度向量a和二维向量A的乘积的范数
     {
     	while (true)
     	{
@@ -182,7 +182,7 @@ private:
 		    	break;
 		}
     }
-    int rand_max(int x)
+    int rand_max(int x)//返回一个属于区间[0,x)的整数  
     {
         int res = (rand()*rand())%x;
         while (res<0)
@@ -194,8 +194,8 @@ private:
     {
         res=0;
         int nbatches=100;
-        int nepoch = 1000;
-        int batchsize = fb_h.size()/nbatches;
+        int nepoch = 1000; //最大迭代次数  
+        int batchsize = fb_h.size()/nbatches; //
         relation_tmp=relation_vec;
         entity_tmp = entity_vec;
         A_tmp = A;
@@ -203,12 +203,12 @@ private:
             {
 
             	res=0;
-             	for (int batch = 0; batch<nbatches; batch++)
+             	for (int batch = 0; batch<nbatches; batch++)//替换实体???
              	{
              		for (int k=0; k<batchsize; k++)
              		{
-             			int i=rand_max(fb_h.size());
-						int j=rand_max(entity_num);
+             			int i=rand_max(fb_h.size());//从头实体数组中产生一个下标  
+						int j=rand_max(entity_num);//从总实体（头+尾）数组中产生一个下标  
 						double pr = 1000*right_mean[fb_r[i]]/(right_mean[fb_r[i]]+left_mean[fb_r[i]]);
 						if (method ==0)
                             pr = 500;
@@ -269,7 +269,7 @@ private:
             }
     }
     double res1;
-    double calc_sum(int e1,int e2,int rel,int same)
+    double calc_sum(int e1,int e2,int rel,int same) //计算误差（实体e2和e1+rel的距离）
     {
     	vector<double> e1_vec;
         e1_vec.resize(m);
@@ -292,7 +292,7 @@ private:
             	sum+=sqr(e2_vec[ii]-e1_vec[ii]-same*relation_vec[rel][ii]);
         return sum;
     }
-    void gradient_one(int e1, int e2, int rel, int belta,int same)
+    void gradient_one(int e1, int e2, int rel, int belta,int same)//梯度下降法
     {
     	for (int ii=0; ii<m; ii++)
         {
@@ -302,7 +302,7 @@ private:
                 tmp1+=A[rel][jj][ii]*entity_vec[e1][jj];
                 tmp2+=A[rel][jj][ii]*entity_vec[e2][jj];
             }
-            double x = 2*(tmp2-tmp1-relation_vec[rel][ii]);
+            double x = 2*(tmp2-tmp1-relation_vec[rel][ii]);//梯度
             if (L1_flag)
             	if (x>0)
             		x=1;
